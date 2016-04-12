@@ -1,6 +1,12 @@
 #ifndef HH_Parameters_HH
 #define HH_Parameters_HH
 #include <iosfwd>
+#include <string>
+enum HowRes {
+	TOFILE,
+	TOPLOT,
+	BOTH
+};
 struct parameters
 {
   //! max number of iteration for Gauss-Siedel
@@ -23,6 +29,10 @@ struct parameters
   double hc;
   //! Number of elements
   int M;
+  //! File where the result will be stored
+  std::string fileout;
+  //! How to show the result
+  HowRes howres;
   //! Constructor takes default values
   parameters():
     itermax(1000000),
@@ -34,7 +44,9 @@ struct parameters
     Te(20.),
     k(0.164),
     hc(1.e-6*200.),
-    M(100)
+    M(100),
+	fileout("result.dat"),
+	howres(HowRes::BOTH)
   {}
 };
 //! Prints parameters

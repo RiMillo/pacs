@@ -20,3 +20,7 @@ k=0.164
 hc=200.0e-6
 # Number of elements
 M=11
+# File where the result will be stored
+fileout=result.dat
+# How to show the result: both, tofile, toplot 
+howres=both

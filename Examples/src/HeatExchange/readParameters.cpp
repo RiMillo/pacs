@@ -1,6 +1,7 @@
 #include "GetPot.hpp"
 #include "readParameters.hpp"
 #include <fstream>
+#include <string>
 parameters readParameters(std::string const & filename,bool verbose)
 {
   // Parameter default constructor fills it with the defaults values
@@ -31,6 +32,12 @@ parameters readParameters(std::string const & filename,bool verbose)
   values.k=ifile("k",defaults.k);
   values.hc=ifile("hc",defaults.hc);
   values.M=ifile("M",defaults.M);
+  values.fileout=ifile("fileout",defaults.fileout.c_str());
+  std::string tmp=ifile("howres","both");
+  int ttmp=tmp.compare("tofile");
+  if(ttmp<0) values.howres=HowRes::BOTH;
+  else if(ttmp==0) values.howres=HowRes::TOFILE;
+  else values.howres=HowRes::TOPLOT;
   if(verbose)
     {
       std::cout<<"PARAMETER VALUES IN GETPOT FILE"<<"\n";
