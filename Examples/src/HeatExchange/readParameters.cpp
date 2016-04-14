@@ -38,6 +38,13 @@ parameters readParameters(std::string const & filename,bool verbose)
   if(ttmp<0) values.howres=HowRes::BOTH;
   else if(ttmp==0) values.howres=HowRes::TOFILE;
   else values.howres=HowRes::TOPLOT;
+  tmp.clear();
+  tmp=ifile("norm","vect");
+  ttmp=tmp.compare("l2");
+  if(ttmp<0) values.norm=Norm::H1;
+  else if(ttmp==0) values.norm=Norm::L2;
+  else values.norm=Norm::VECT;
+
   if(verbose)
     {
       std::cout<<"PARAMETER VALUES IN GETPOT FILE"<<"\n";

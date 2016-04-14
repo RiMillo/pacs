@@ -7,6 +7,12 @@ enum HowRes {
 	TOPLOT,
 	BOTH
 };
+enum Norm {
+	VECT,
+	L2,
+	H1
+};
+
 struct parameters
 {
   //! max number of iteration for Gauss-Siedel
@@ -33,6 +39,8 @@ struct parameters
   std::string fileout;
   //! How to show the result
   HowRes howres;
+  //! Norm to use to compute the residual
+  Norm norm;
   //! Constructor takes default values
   parameters():
     itermax(1000000),
@@ -46,7 +54,8 @@ struct parameters
     hc(1.e-6*200.),
     M(100),
 	fileout("result.dat"),
-	howres(HowRes::BOTH)
+	howres(HowRes::BOTH),
+	norm(Norm::VECT)
   {}
 };
 //! Prints parameters
