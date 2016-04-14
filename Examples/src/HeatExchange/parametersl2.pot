@@ -26,3 +26,4 @@ fileout=resultL2.dat
 howres=both
 # Norm to use for computing the residual: vect, l2, h1
 norm=l2
+method=0

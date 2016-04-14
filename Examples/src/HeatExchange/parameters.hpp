@@ -41,6 +41,9 @@ struct parameters
   HowRes howres;
   //! Norm to use to compute the residual
   Norm norm;
+  //! Method to solve the linear sys: 0=iterative (Gauss-Seidel),
+  //1=direct(Thomas)
+  unsigned int method;
   //! Constructor takes default values
   parameters():
     itermax(1000000),
@@ -55,7 +58,8 @@ struct parameters
     M(100),
 	fileout("result.dat"),
 	howres(HowRes::BOTH),
-	norm(Norm::VECT)
+	norm(Norm::VECT),
+	method(0)
   {}
 };
 //! Prints parameters

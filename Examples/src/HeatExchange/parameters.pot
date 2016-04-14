@@ -26,3 +26,5 @@ fileout=result.dat
 howres=both
 # Norm to use for computing the residual: vect, l2, h1
 norm=vect
+# Method for solving the linear sys: 0=iterative, 1=direct
+method=1

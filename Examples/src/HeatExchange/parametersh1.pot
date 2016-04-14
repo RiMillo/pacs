@@ -26,3 +26,4 @@ fileout=resultH1.dat
 howres=both
 # Norm to use for computing the residual: vect, l2, h1
 norm=h1
+method=0

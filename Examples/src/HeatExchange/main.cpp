@@ -6,6 +6,7 @@
 #include "GetPot.hpp"
 #include "gnuplot-iostream.hpp"// interface with gnuplot
 #include "cmpnorm.hpp"
+#include "algothomas.h"
 /*!
   @file main.cpp
   @brief Temperature distribution in a 1D bar.
@@ -65,7 +66,8 @@ int main(int argc, char** argv)
   const auto&    M=param.M; // Number of grid elements
   const auto& fout=param.fileout;  //Where result will be stored
   const auto& hres=param.howres;  //How to show the result
-  const auto& nrm =param.norm;
+  const auto& nrm =param.norm;  //Norm to use
+  const auto& met =param.method;  //solver to use
   
   //! Precomputed coefficient for adimensional form of equation
   const auto act=2.*(a1+a2)*hc*L*L/(k*a1*a2);
@@ -76,34 +78,39 @@ int main(int argc, char** argv)
   // Solution vector
   std::vector<double> theta(M+1);
   
-  //Building the tri diag matrix via 3 vectors
-  //vector<double> lowdiag(M,-1.0),			// Lower diag
-				 //maindiag(M+1,2.+h*h*act),	// Main diag
-				 //updiag(M,-1.0);			// Upper diag
+  if(met==1) //Direct solver: Thomas
+  {
+	//Building the tri diag matrix via 3 vectors
+	vector<double>	lowdiag(M,-1.0),			// Lower diag
+					maindiag(M+1,2.+h*h*act),	// Main diag
+					updiag(M,-1.0);			// Upper diag
   //Setting the right coefficients for the boundaries
-  //maindiag[0]=1.0;
-  //updiag[0]=0.0;
-  //maindiag[M]=1.0;
-  //building the knowns vector
-  //vector<double> b(M+1,0.0);
-  //Fixing the right coefficient
-  //b[0]=(To-Te)/Te;
+	maindiag[0]=1.0;
+	updiag[0]=0.0;
+	maindiag[M]=1.0;
+	//building the knowns vector
+	vector<double> b(M+1,0.0);
+	//Fixing the right coefficient
+	b[0]=(To-Te)/Te;
+	thomas(maindiag,updiag,lowdiag,b,theta);
+  }
+  else
+  {
+	// Gauss Siedel is initialised with a linear variation
+	// of T
   
-  // Gauss Siedel is initialised with a linear variation
-  // of T
+	for(unsigned int m=0;m <= M;++m)
+		theta[m]=(1.-m*h)*(To-Te)/Te;
   
-  for(unsigned int m=0;m <= M;++m)
-     theta[m]=(1.-m*h)*(To-Te)/Te;
+	// Gauss-Seidel
+	// epsilon=||x^{k+1}-x^{k}||
+	// Stopping criteria epsilon<=toler
   
-  // Gauss-Seidel
-  // epsilon=||x^{k+1}-x^{k}||
-  // Stopping criteria epsilon<=toler
-  
-  int iter=0;
-  double epsilon;
-  std::vector<double> xnew(M+1), diff(M+1);
-  xnew[0]=theta[0]; diff[0]=0.0;
-     do
+	int iter=0;
+	double epsilon;
+	std::vector<double> xnew(M+1), diff(M+1);
+	xnew[0]=theta[0]; diff[0]=0.0;
+    do
        { epsilon=0.;
 
 	 // first M-1 row of linear system
@@ -123,7 +130,7 @@ int main(int argc, char** argv)
 		epsilon  = choosenorm(diff,nrm,h);  
 		iter=iter+1;     
 	  }while((sqrt(epsilon) > toler) && (iter < itermax) );
-
+	//end DOWHILE
     if(iter<itermax)
       cout << "M="<<M<<"  Convergence in "<<iter<<" iterations"<<endl;
     else
@@ -131,8 +138,8 @@ int main(int argc, char** argv)
 	cerr << "NOT CONVERGING in "<<itermax<<" iterations "<<
 	  "||dx||="<<sqrt(epsilon)<<endl;
 	status=1;
-      }
-
+      }//end IF itermax
+  }//end IF method
  // Analitic solution
 
     vector<double> thetaa(M+1);
