@@ -43,8 +43,8 @@ struct parameters
   Norm norm;
   //! Method to solve the linear sys: 0=iterative (Gauss-Seidel),
   //1=direct(Thomas)
-  unsigned int method;
-  //! Constructor takes default values
+  int method;
+ //! Constructor takes default values
   parameters():
     itermax(1000000),
     toler(1e-8),
