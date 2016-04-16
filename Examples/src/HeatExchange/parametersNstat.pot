@@ -21,7 +21,7 @@ hc=200.0e-6
 # Number of elements
 M=11
 # File where the result will be stored
-fileout=result.dat
+fileout=resultNstat.dat
 # How to show the result: both, tofile, toplot 
 howres=both
 # Norm to use for computing the residual: vect, l2, h1
@@ -29,11 +29,11 @@ norm=vect
 # Method for solving the linear sys: 0=iterative, 1=direct
 method=1
 # NON Stationary problem?
-nstat=0
+nstat=1
 # Initial temperature (equal for all the bar)
 # (We choose to set it as the external one)
 Ti=20.
 # Time limit [s]
-TT=0.5
+TT=2.0
 # Number of time step (initial one included)
-MT=11
+MT=41

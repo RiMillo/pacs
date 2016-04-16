@@ -45,6 +45,10 @@ parameters readParameters(std::string const & filename,bool verbose)
   else if(ttmp==0) values.norm=Norm::L2;
   else values.norm=Norm::VECT;
   values.method=ifile("method",defaults.method);
+  values.nstat=ifile("nstat",defaults.nstat);
+  values.Ti=ifile("Ti",defaults.Ti);
+  values.TT=ifile("TT",defaults.TT);
+  values.MT=ifile("MT",defaults.MT);
   if(verbose)
     {
       std::cout<<"PARAMETER VALUES IN GETPOT FILE"<<"\n";

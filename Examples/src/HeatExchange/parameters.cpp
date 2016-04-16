@@ -16,6 +16,10 @@ std::ostream & operator << (std::ostream & out,const parameters & p)
   out<<"fileout= "<<p.fileout<<"\n";
   out<<"howres= "<<p.howres<<"\n";
   out<<"norm= "<<p.norm<<"\n";
-  out<<"method= "<<p.method<<"\n\n";
+  out<<"method= "<<p.method<<"\n";
+  out<<"nstat= "<<p.nstat<<"\n";
+  out<<"Ti= "<<p.Ti<<"\n";
+  out<<"TT= "<<p.TT<<"\n";
+  out<<"MT= "<<p.MT<<"\n\n";
   return out;
 }

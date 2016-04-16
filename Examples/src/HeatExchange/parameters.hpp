@@ -44,7 +44,16 @@ struct parameters
   //! Method to solve the linear sys: 0=iterative (Gauss-Seidel),
   //1=direct(Thomas)
   int method;
- //! Constructor takes default values
+  //! NON Stationary problem?
+  int nstat;
+  //! Initial temperature (equal for all the bar)
+  //! (We choose to set it as the external one)
+  double Ti;
+  //! Time limit [s]
+  double TT;
+  //! Number of time step (initial one included)
+  int MT;
+  //! Constructor takes default values
   parameters():
     itermax(1000000),
     toler(1e-8),
@@ -59,7 +68,11 @@ struct parameters
 	fileout("result.dat"),
 	howres(HowRes::BOTH),
 	norm(Norm::VECT),
-	method(0)
+	method(0),
+	nstat(0),
+	Ti(Te),
+	TT(0.5),
+	MT(11)
   {}
 };
 //! Prints parameters
