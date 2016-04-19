@@ -5,6 +5,7 @@
 #include <memory>
 #include <array>
 #include <cassert>
+#include <cmath>
 
 using namespace std; 
 
@@ -183,8 +184,8 @@ void Grid::read_set(string const & file) {
 double Grid::sum_area(){
 	double res(0.0);
 	//for(unsigned int i=0; i<vap.size();++i)
-		//res += (vap[i])->area();
+		//res += abs((vap[i])->area());
 	for(auto it=vap.begin();it!=vap.end();++it)
-		res += (*it)->area();
+		res += abs((*it)->area());
 	return res;
 }//END SUM_AREA
