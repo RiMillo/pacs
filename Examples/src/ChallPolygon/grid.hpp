@@ -32,7 +32,15 @@ public:
 		std::cout << vpt.size() << " point(s)\n";
 		std::cout << vap.size() << " polygon(s)\n";
 	}
+	void print_area() {
+		for(auto it=vap.begin(); it!=vap.end();++it)
+			std::cout << (*it)->area()<<std::endl;
+	}
 
+	//void print_polpt(){
+		//for(auto it=vap.begin(); it!=vap.end();++it)
+			//(*it)->print_pt();
+	//}
 };//END CLASS GRID
 
 #endif

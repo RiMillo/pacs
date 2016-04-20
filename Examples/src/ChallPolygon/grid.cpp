@@ -6,6 +6,7 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 
 using namespace std; 
 
@@ -44,7 +45,8 @@ Grid::Grid(string const & file) {
 		vap.reserve(N[1]);
 		//auto const bbb=vap.begin();
 		unsigned int shape;
-		vector<Geometry::Point2D> vert;
+		//vector<Geometry::Point2D> vert;	//2.1
+		vector<unsigned int> vert;	//2.2
 		for(unsigned int npt=0; npt<N[1];++npt) {
 			assert(getline(f, tmpline));
 			//Get the position (in case they won't be ordered
@@ -53,7 +55,7 @@ Grid::Grid(string const & file) {
 			//Get the shape
 			tmpline=tmpline.substr(sz);
 			shape = stoi(tmpline,&sz);
-			int pp;
+			unsigned int pp;
 			//Switch on shape
 			switch(shape) {
 			case 0:
@@ -62,10 +64,12 @@ Grid::Grid(string const & file) {
 				tmpline=tmpline.substr(sz);
 				for(unsigned int i=0; i<3;++i){
 					pp=stoi(tmpline,&sz);
-					vert.push_back(vpt[pp]);
+					//vert.push_back(vpt[pp]);	//2.1
+					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
 				}
-				vap.emplace_back(new Geometry::Triangle(vert));
+				//vap.emplace_back(new Geometry::Triangle(vert));	//2.1
+				vap.emplace_back(new Geometry::Triangle(vert,&vpt));	//2.2
 				break;
 			case 1:
 				//Square
@@ -73,27 +77,32 @@ Grid::Grid(string const & file) {
 				tmpline=tmpline.substr(sz);
 				for(unsigned int i=0; i<4;++i){
 					pp=stoi(tmpline,&sz);
-					vert.push_back(vpt[pp]);
+					//vert.push_back(vpt[pp]);	//2.1
+					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
 				}
-				vap.emplace_back(new Geometry::Square(vert));
+				//vap.emplace_back(new Geometry::Square(vert));	//2.1
+				vap.emplace_back(new Geometry::Square(vert,&vpt));	//2.2
+
 				break;
 			default:
-				//Trinagle
+				//Generic
 				vert.reserve(6);
 				tmpline=tmpline.substr(sz);
 				while(tmpline.size()>0){
 					pp=stoi(tmpline,&sz);
-					vert.push_back(vpt[pp]);
+					//vert.push_back(vpt[pp]);	//2.1
+					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
 				}
-				vap.emplace_back(new Geometry::Polygon(vert));
+				//vap.emplace_back(new Geometry::Polygon(vert));	//2.1
+				vap.emplace_back(new Geometry::Polygon(vert,&vpt));	//2.2
 				break;
 			}//END SWITCH
 			vert.clear();
 		}//END FOR POLYGON
 		f.close();
-	} else throw("File not found");    //END IF F
+	} else {throw("File not found"); exit(EXIT_FAILURE);}    //END IF F
 }//END CONSTRUCTOR
 void Grid::read_set(string const & file) {
 	this->clear();
@@ -129,7 +138,8 @@ void Grid::read_set(string const & file) {
 		// 3- Building polygon vector
 		vap.reserve(N[1]);
 		unsigned int shape;
-		vector<Geometry::Point2D> vert;
+		//vector<Geometry::Point2D> vert;	//2.1
+		vector<unsigned int> vert;	//2.2
 		for(unsigned int npt=0; npt<N[1];++npt) {
 			assert(getline(f, tmpline));
 			//Get the position (in case they won't be ordered
@@ -138,7 +148,7 @@ void Grid::read_set(string const & file) {
 			//Get the shape
 			tmpline=tmpline.substr(sz);
 			shape = stoi(tmpline,&sz);
-			int pp;
+			unsigned int pp;
 			//Switch on shape
 			switch(shape) {
 			case 0:
@@ -147,10 +157,12 @@ void Grid::read_set(string const & file) {
 				tmpline=tmpline.substr(sz);
 				for(unsigned int i=0; i<3;++i){
 					pp=stoi(tmpline,&sz);
-					vert.push_back(vpt[pp]);
+					//vert.push_back(vpt[pp]);	//2.1
+					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
 				}
-				vap.emplace_back(new Geometry::Triangle(vert));
+				//vap.emplace_back(new Geometry::Triangle(vert));	//2.1
+				vap.emplace_back(new Geometry::Triangle(vert,&vpt));	//2.2
 				break;
 			case 1:
 				//Square
@@ -158,27 +170,32 @@ void Grid::read_set(string const & file) {
 				tmpline=tmpline.substr(sz);
 				for(unsigned int i=0; i<4;++i){
 					pp=stoi(tmpline,&sz);
-					vert.push_back(vpt[pp]);
+					//vert.push_back(vpt[pp]);	//2.1
+					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
 				}
-				vap.emplace_back(new Geometry::Square(vert));
+				//vap.emplace_back(new Geometry::Square(vert));	//2.1
+				vap.emplace_back(new Geometry::Square(vert,&vpt));	//2.2
+
 				break;
 			default:
-				//Trinagle
+				//Generic
 				vert.reserve(6);
 				tmpline=tmpline.substr(sz);
 				while(tmpline.size()>0){
 					pp=stoi(tmpline,&sz);
-					vert.push_back(vpt[pp]);
+					//vert.push_back(vpt[pp]);	//2.1
+					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
 				}
-				vap.emplace_back(new Geometry::Polygon(vert));
+				//vap.emplace_back(new Geometry::Polygon(vert));	//2.1
+				vap.emplace_back(new Geometry::Polygon(vert,&vpt));	//2.2
 				break;
 			}//END SWITCH
 			vert.clear();
 		}//END FOR POLYGON
 		f.close();
-	} else throw("File not found");    //END IF F
+	} else {throw("File not found"); exit(EXIT_FAILURE);}    //END IF F
 }//END CONSTRUCTOR
 
 double Grid::sum_area(){

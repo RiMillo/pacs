@@ -12,6 +12,9 @@ int main(int argc, char** argv) {
 	//Grid g;
 	//g.read_set(file);
 	
+	//g.print();
+	//g.print_area();
+	
 	cout << g.sum_area()<< endl;
 	return 0;
 }
