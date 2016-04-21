@@ -7,6 +7,10 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <set>
+#include <utility>
+#include <vector>
+#include <string>
 
 using namespace std; 
 
@@ -41,12 +45,17 @@ Grid::Grid(string const & file) {
 			tmpline.clear();
 		}//END FOR POINT
 		
-		// 3- Building polygon vector
+		// 3- Building polygon vector & temporary edges
 		vap.reserve(N[1]);
 		//auto const bbb=vap.begin();
 		unsigned int shape;
 		//vector<Geometry::Point2D> vert;	//2.1
 		vector<unsigned int> vert;	//2.2
+		//Utilities for build vectors edges
+		unsigned int prev, fst;
+		set<Edge> tmp_all, tmp_bord;
+		set<Edge>::iterator iter;
+		bool				insert;
 		for(unsigned int npt=0; npt<N[1];++npt) {
 			assert(getline(f, tmpline));
 			//Get the position (in case they won't be ordered
@@ -59,6 +68,7 @@ Grid::Grid(string const & file) {
 			//Switch on shape
 			switch(shape) {
 			case 0:
+			{
 				//Trinagle
 				vert.reserve(3);
 				tmpline=tmpline.substr(sz);
@@ -67,11 +77,29 @@ Grid::Grid(string const & file) {
 					//vert.push_back(vpt[pp]);	//2.1
 					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
+					if(i==0) {
+						fst=pp;
+						prev=pp;
+						continue;
+					}
+					Edge e(prev,pp);
+					std::tie(iter,insert)=tmp_all.insert(e);
+					if(insert)	tmp_bord.insert(e);
+					else		tmp_bord.erase(e);
+					if(i==2) {
+						e=Edge(fst,pp);
+						std::tie(iter,insert)=tmp_all.insert(e);
+						if(insert)	tmp_bord.insert(e);
+						else		tmp_bord.erase(e);
+					}
+					prev=pp;
 				}
 				//vap.emplace_back(new Geometry::Triangle(vert));	//2.1
 				vap.emplace_back(new Geometry::Triangle(vert,&vpt));	//2.2
 				break;
+			}
 			case 1:
+			{
 				//Square
 				vert.reserve(4);
 				tmpline=tmpline.substr(sz);
@@ -80,27 +108,68 @@ Grid::Grid(string const & file) {
 					//vert.push_back(vpt[pp]);	//2.1
 					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
+					if(i==0) {
+						fst=pp;
+						prev=pp;
+						continue;
+					}
+					Edge e(prev,pp);
+					std::tie(iter,insert)=tmp_all.insert(e);
+					if(insert)	tmp_bord.insert(e);
+					else		tmp_bord.erase(e);
+					if(i==3) {
+						e=Edge(fst,pp);
+						std::tie(iter,insert)=tmp_all.insert(e);
+						if(insert)	tmp_bord.insert(e);
+						else		tmp_bord.erase(e);
+					}
+					prev=pp;
+
 				}
 				//vap.emplace_back(new Geometry::Square(vert));	//2.1
 				vap.emplace_back(new Geometry::Square(vert,&vpt));	//2.2
 
 				break;
+			}
 			default:
+			{
 				//Generic
 				vert.reserve(6);
+				tmpline=tmpline.substr(sz);
+				pp=stoi(tmpline,&sz);
+				fst=pp;
+				prev=pp;
+				vert.push_back(pp);
 				tmpline=tmpline.substr(sz);
 				while(tmpline.size()>0){
 					pp=stoi(tmpline,&sz);
 					//vert.push_back(vpt[pp]);	//2.1
 					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
+					Edge e(prev,pp);
+					std::tie(iter,insert)=tmp_all.insert(e);
+					if(insert)	tmp_bord.insert(e);
+					else		tmp_bord.erase(e);
+					if(!(tmpline.size()>0)) {
+						//Last
+						e=Edge(fst,pp);
+						std::tie(iter,insert)=tmp_all.insert(e);
+						if(insert)	tmp_bord.insert(e);
+						else		tmp_bord.erase(e);
+					}
+					prev=pp;
 				}
 				//vap.emplace_back(new Geometry::Polygon(vert));	//2.1
 				vap.emplace_back(new Geometry::Polygon(vert,&vpt));	//2.2
 				break;
+			}
 			}//END SWITCH
 			vert.clear();
 		}//END FOR POLYGON
+		all.resize(tmp_all.size());
+		copy(tmp_all.begin(),tmp_all.end(),all.begin());
+		bord.resize(tmp_bord.size());
+		copy(tmp_bord.begin(),tmp_bord.end(),bord.begin());
 		f.close();
 	} else {throw("File not found"); exit(EXIT_FAILURE);}    //END IF F
 }//END CONSTRUCTOR
@@ -206,3 +275,34 @@ double Grid::sum_area(){
 		res += abs((*it)->area());
 	return res;
 }//END SUM_AREA
+
+void Grid::print_edges(string const & fall, string const & fbord, string const & finternal){
+	ofstream fa(fall),fb(fbord),fi(finternal);
+	set<unsigned int> sall, sbord;
+	//Building and printing all the points belonging at least to an edge
+	for(Edge const & e : all) {
+		sall.insert(e.a);
+		sall.insert(e.b);
+	}
+	for(unsigned int i : sall)
+		fa << i << "\t";
+	fa.close();
+	//Building and printing all the points belonging to a boundary edge
+	for(Edge const & e : bord) {
+		sbord.insert(e.a);
+		sbord.insert(e.b);
+	}
+	for(unsigned int i : sbord)
+		fb << i << "\t";
+	fb.close();
+	//Building and printing all the internal points
+	vector<unsigned int> vint(sall.size());
+	vector<unsigned int>::iterator it =
+		set_difference(sall.begin(), sall.end(),
+						sbord.begin(), sbord.end(),
+						vint.begin());
+	vint.resize(it-vint.begin());
+	for(unsigned int i : vint)
+		fi << i << "\t";
+	fi.close();
+}
