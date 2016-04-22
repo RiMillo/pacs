@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-//#include <set>
 #include "grid.hpp"
 
 using namespace std;
@@ -25,11 +24,5 @@ int main(int argc, char** argv) {
 
 	g.print_edges("all.txt","bord.txt","internal.txt");
 
-	//set<Edge> se;
-	//se.emplace(0,1);
-	//se.emplace(1,3);
-	//se.emplace(0,1);
-	//for(auto ss : se)
-		//cout << ss;
 	return 0;
 }

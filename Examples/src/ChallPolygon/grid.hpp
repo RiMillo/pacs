@@ -57,7 +57,7 @@ public:
 
 	void read_set(std::string const & file);
 	double sum_area();
-	void clear() {vpt.clear(); vap.clear();}
+	void clear() {vpt.clear(); vap.clear(); all.clear(); bord.clear();}
 
 	Grid& operator = (Grid const & g)=default;
 

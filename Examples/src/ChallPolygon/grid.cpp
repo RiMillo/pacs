@@ -156,6 +156,7 @@ Grid::Grid(string const & file) {
 						std::tie(iter,insert)=tmp_all.insert(e);
 						if(insert)	tmp_bord.insert(e);
 						else		tmp_bord.erase(e);
+						break;
 					}
 					prev=pp;
 				}
@@ -204,11 +205,17 @@ void Grid::read_set(string const & file) {
 			tmpline.clear();
 		}//END FOR POINT
 		
-		// 3- Building polygon vector
+		// 3- Building polygon vector & temporary edges
 		vap.reserve(N[1]);
+		//auto const bbb=vap.begin();
 		unsigned int shape;
 		//vector<Geometry::Point2D> vert;	//2.1
 		vector<unsigned int> vert;	//2.2
+		//Utilities for build vectors edges
+		unsigned int prev, fst;
+		set<Edge> tmp_all, tmp_bord;
+		set<Edge>::iterator iter;
+		bool				insert;
 		for(unsigned int npt=0; npt<N[1];++npt) {
 			assert(getline(f, tmpline));
 			//Get the position (in case they won't be ordered
@@ -221,19 +228,41 @@ void Grid::read_set(string const & file) {
 			//Switch on shape
 			switch(shape) {
 			case 0:
+			{
 				//Trinagle
 				vert.reserve(3);
 				tmpline=tmpline.substr(sz);
-				for(unsigned int i=0; i<3;++i){
-					pp=stoi(tmpline,&sz);
-					//vert.push_back(vpt[pp]);	//2.1
-					vert.push_back(pp);	//2.2
-					tmpline=tmpline.substr(sz);
-				}
+				//1
+				pp=stoi(tmpline,&sz);
+				vert.push_back(pp);
+				//Updates
+				fst=pp; prev=pp; tmpline=tmpline.substr(sz);
+				//2
+				pp=stoi(tmpline,&sz);
+				vert.push_back(pp);
+				Edge e(prev,pp);
+				std::tie(iter,insert)=tmp_all.insert(e);
+				if(insert)	tmp_bord.insert(e);
+				else		tmp_bord.erase(e);
+				//Updates
+				prev=pp; tmpline=tmpline.substr(sz);
+				//3
+				pp=stoi(tmpline,&sz);
+				vert.push_back(pp);
+				e=Edge(prev,pp);
+				std::tie(iter,insert)=tmp_all.insert(e);
+				if(insert)	tmp_bord.insert(e);
+				else		tmp_bord.erase(e);
+				e=Edge(fst,pp);
+				std::tie(iter,insert)=tmp_all.insert(e);
+				if(insert)	tmp_bord.insert(e);
+				else		tmp_bord.erase(e);
 				//vap.emplace_back(new Geometry::Triangle(vert));	//2.1
 				vap.emplace_back(new Geometry::Triangle(vert,&vpt));	//2.2
 				break;
+			}
 			case 1:
+			{
 				//Square
 				vert.reserve(4);
 				tmpline=tmpline.substr(sz);
@@ -242,27 +271,70 @@ void Grid::read_set(string const & file) {
 					//vert.push_back(vpt[pp]);	//2.1
 					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
-				}
+					if(i==0) {
+						fst=pp;
+						prev=pp;
+						continue;
+					}
+					Edge e(prev,pp);
+					std::tie(iter,insert)=tmp_all.insert(e);
+					if(insert)	tmp_bord.insert(e);
+					else		tmp_bord.erase(e);
+					if(i==3) {
+						e=Edge(fst,pp);
+						std::tie(iter,insert)=tmp_all.insert(e);
+						if(insert)	tmp_bord.insert(e);
+						else		tmp_bord.erase(e);
+					}
+					prev=pp;
+
+				}//END FOR 
 				//vap.emplace_back(new Geometry::Square(vert));	//2.1
 				vap.emplace_back(new Geometry::Square(vert,&vpt));	//2.2
 
 				break;
+			}
 			default:
+			{
 				//Generic
 				vert.reserve(6);
+				tmpline=tmpline.substr(sz);
+				pp=stoi(tmpline,&sz);
+				fst=pp;
+				prev=pp;
+				vert.push_back(pp);
 				tmpline=tmpline.substr(sz);
 				while(tmpline.size()>0){
 					pp=stoi(tmpline,&sz);
 					//vert.push_back(vpt[pp]);	//2.1
 					vert.push_back(pp);	//2.2
 					tmpline=tmpline.substr(sz);
-				}
+					Edge e(prev,pp);
+					std::tie(iter,insert)=tmp_all.insert(e);
+					if(insert)	tmp_bord.insert(e);
+					else		tmp_bord.erase(e);
+					if(!(tmpline.size()>0)) {
+						//Last
+						e=Edge(fst,pp);
+						std::tie(iter,insert)=tmp_all.insert(e);
+						if(insert)	tmp_bord.insert(e);
+						else		tmp_bord.erase(e);
+						break;
+					}
+					prev=pp;
+				}//END WHILE
 				//vap.emplace_back(new Geometry::Polygon(vert));	//2.1
 				vap.emplace_back(new Geometry::Polygon(vert,&vpt));	//2.2
 				break;
+			}
 			}//END SWITCH
 			vert.clear();
 		}//END FOR POLYGON
+		all.resize(tmp_all.size());
+		copy(tmp_all.begin(),tmp_all.end(),all.begin());
+		bord.resize(tmp_bord.size());
+		copy(tmp_bord.begin(),tmp_bord.end(),bord.begin());
+
 		f.close();
 	} else {throw("File not found"); exit(EXIT_FAILURE);}    //END IF F
 }//END CONSTRUCTOR
